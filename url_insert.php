@@ -29,10 +29,10 @@ if (filter_var($urlLong, FILTER_VALIDATE_URL) === false) {
 if (!$errors) {
     $handle = mysqli_connect($jerwtf['host'], $jerwtf['login'], $jerwtf['pass'], $jerwtf['database'])
         or die('Failure connecting to database');
-    $query = "INSERT INTO redirects VALUES('$urlShort', '$urlLong', NOW())";
+    $query = "INSERT INTO redirects VALUES('$urlShort', '$urlLong', NOW(), 0, '$username')";
     mysqli_query($handle, $query) or die('Failure writing to database');
     mysqli_close($handle);
-    echo 'Success! <a href="jer.wtf/' . $urlShort . '">jer.wtf/' . $urlShort . '</a>';
+    echo 'Success! <a href="http://jer.wtf/' . $urlShort . '">jer.wtf/' . $urlShort . '</a>';
 } else {
     echo 'Fail. Errors:';
     echo $errors;
