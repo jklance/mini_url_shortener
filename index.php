@@ -1,51 +1,30 @@
 <?php
+$configsPath = "./";
+
+require('UrlRedirector.php');
+require('UrlRedirectDb.php');
+
 
 $urlElements    = trim($_SERVER["REQUEST_URI"], "\s\/");
 $urlParts       = explode('/', $urlElements);
 $redirectUrl    = null;
 
-$configs        = "../configs/db.conf";
-require($configs);
+$configFile     = $configPath . "redirector.conf";
+require($configFile);
 
-$shortenedChars = '/^[A-za-z0-9_]{1,20}$/';
+$redirector = new UrlRedirector($urlParts[0]);
+$redirectDb = new UrlRedirectDb($config['db']);
 
-if (isset($urlParts[0]) && preg_match($shortenedChars, $urlParts[0])) {
-    // Retrieve redirect URL
-    $redirectUrl = retrieveRedirectUrl($urlParts[0], $jerwtf);
+if ($redirector->getShort()) {
+    $redirector->setLong($redirectDb->getRedirecturl($redirector));
 } 
 
-if ($redirectUrl) {
-    header("HTTP/1.1 302 Found");
-    header("Location: " . $redirectUrl);
+if ($redirector->getLong()) {
+    $redirector->getRedirectHeader();
     exit();
 }
 
 
-function retrieveRedirectUrl($key, $dbInfo) {
-    // Assumes a table named 'redirects' with column 'redirect_key' as the short
-    // form and 'redirect_url' as the long form.
-
-    $handle = mysqli_connect($dbInfo['host'], $dbInfo['login'], $dbInfo['pass'], $dbInfo['database']) 
-        or die('Error connecting to database');
-    
-    $query = "SELECT redirect_url FROM redirects WHERE redirect_key = '$key'";
-    $resultArr = array();
-
-    $result = mysqli_query($handle, $query);
-    $row    = mysqli_fetch_assoc($result);
-
-    $counter = "UPDATE redirects SET uses = uses + 1 WHERE redirect_key = '$key'";
-    $logger  = "INSERT INTO redirect_log VALUES('$key', NOW())";
-    mysqli_query($handle, $counter);
-    mysqli_query($handle, $logger);
-
-    mysqli_close($handle);
-
-    if (isset($row['redirect_url'])) {
-        return $row['redirect_url'];
-    }
-    return null;
-}
 
 
 ?>
@@ -56,6 +35,13 @@ function retrieveRedirectUrl($key, $dbInfo) {
     <style>
         body {
             background: lightgrey;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
         }
         
     </style>
@@ -71,6 +57,24 @@ function retrieveRedirectUrl($key, $dbInfo) {
 <input type="password" id="seckey" name="seckey" />Password <br />
 <input type="submit" /><br />
 </form>
+
+<?php
+$count = 20;
+$logEntries = $redirectDb->getAllLogEntries($count);
+
+if ($logEntries) {
+    echo "<h3>Most Recent Uses</h3>\n<table>\n";
+
+    foreach ($logEntries as $entry) {
+        echo '<tr><td>' . $entry['short'];
+        echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
+        echo '</td><td>' . $entry['date'];
+        echo '</td></tr>';
+    }
+}
+
+?>
+</table>
 </body>
 <script>
 function makeShort()

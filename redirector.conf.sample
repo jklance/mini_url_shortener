@@ -1,0 +1,10 @@
+<?php
+// Database Settings
+$db = array(
+    "login"     => "login",
+    "pass"      => "password",
+    "host"      => "hostname",
+    "database"  => "localhost",
+    "port"      => "3306"
+);
+
