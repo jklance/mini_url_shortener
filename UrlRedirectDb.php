@@ -1,6 +1,5 @@
 <?php
 
-
 class UrlRedirectDb
 {
     private $_hostname = null;
@@ -58,37 +57,63 @@ class UrlRedirectDb
     function getTopShorts($count = null) {
         $this->_openHandle();
 
-        $unique = 'redirect_url';
-        $sort   = 'date_used';
-
-        $logEntries = $this->_retrieveTopLogEntries($count, $sort, $unique);
+        $logEntries = $this->_retrieveTopShorts($count);
 
         $this->_closeHandle();
 
         return $logEntries;
     }
 
+    function setRedirectUrl($redirector) {
+        if ($redirector->getShort() && $redirector->getLong()) {
+            $this->_openHandle();
+
+            return $this->_postRedirectToDb($redirector);
+
+            $this->_closeHandle();
+        }
+        return false;
+    }
+
 /***** Private Methods ******************************************************/
-    
-    private function _retrieveTopLogEntries($count, $sort, $unique) {
-        $query = "SELECT log.redirect_key AS short";
-        $query .= ", log.date_used AS date";
+   
+    private function _postRedirectToDb($redirector) {
+        $query  = "INSERT INTO redirects VALUES";
+        $query .= "('" . $redirector->getShort() . "','" . $redirector->getLong() . "',NOW(),0,'" . $redirector->getUser() ."')";
+
+        if (mysqli_query($this->_dbHandle, $query) === true) {
+            return true;
+        }
+        return false;
+    }
+
+    private function _retrieveTopShorts($count) {
+        $query  = "SELECT log.redirect_key AS short";
+        $query .= ", COUNT(log.date_used) AS count";
         $query .= ", main.redirect_url AS url";
         $query .= ", main.user AS user";
-
-    
-
         $query .= " FROM redirect_log log ";
         $query .= " JOIN redirects main ON log.redirect_key = main.redirect_key";
-        $query .= " ORDER BY date DESC";
+        $query .= " GROUP BY short";
+        $query .= " ORDER BY count DESC";
 
         if ($count) {
             $query .= " LIMIT $count";
         }
+
+        $result = mysqli_query($this->_dbHandle, $query);
+        if ($result) {
+            $resArr = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+            if (is_array($resArr)) {
+                return $resArr;
+            }
+        }
+        return null;
     }
 
     private function _retrieveAllLogEntriesFromDb($count) {
-        $query = "SELECT log.redirect_key AS short";
+        $query  = "SELECT log.redirect_key AS short";
         $query .= ", log.date_used AS date";
         $query .= ", main.redirect_url AS url";
         $query .= ", main.user AS user";
@@ -142,24 +167,14 @@ class UrlRedirectDb
     }
 
     private function _openHandle() {
-        if (!$this->_isHandleConnected()) {
-            if ($this->_fieldsFilled()) {
-                $this->_dbHandle = mysqli_connect(
-                    $this->_hostname,
-                    $this->_username,
-                    $this->_password,
-                    $this->_database,
-                    $this->_portnum
-                ) or die('Graceless DB failure connecting!');
-                return true;
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private function _isHandleConnected() {
-        if ($this->_dbHandle && $this->_dbHandle->ping()) {
+        if ($this->_fieldsFilled()) {
+            $this->_dbHandle = mysqli_connect(
+                $this->_hostname,
+                $this->_username,
+                $this->_password,
+                $this->_database,
+                $this->_portnum
+            ) or die('Graceless DB failure connecting!');
             return true;
         }
         return false;

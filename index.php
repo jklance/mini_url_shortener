@@ -24,10 +24,9 @@ if ($redirector->getLong()) {
     exit();
 }
 
-
-
-
 ?>
+
+
 <html>
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -40,7 +39,7 @@ if ($redirector->getLong()) {
             border: 1px solid black;
         }
         th, td {
-            padding: 15px;
+            padding: 3px;
             text-align: left;
         }
         
@@ -51,15 +50,32 @@ if ($redirector->getLong()) {
 <h2>Redirection Service</h2>
 
 <form id="urlshortenerform" method="post" action="https://jer.wtf/url_insert.php">
-<input type="text" id="shortname" name="shortname" />Short Name (<span onclick="makeShort()">Generate</span>)<br />
+<input type="text" id="short" name="short" />Shortened URL (<a href="#" onclick="makeShort(); return false;">Generate</a>)<br />
 <input type="url" id="url" name="url" />URL <br />
 <input type="text" id="secusr" name="secusr" />Username <br />
 <input type="password" id="seckey" name="seckey" />Password <br />
 <input type="submit" /><br />
 </form>
+<?php
+$count = 10;
+$logEntries = $redirectDb->getTopShorts($count);
+
+if ($logEntries) {
+    echo "<h3>Most Used Shorts</h3>\n<table>\n";
+
+    foreach ($logEntries as $entry) {
+        echo '<tr><td>' . $entry['short'];
+        echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
+        echo '</td><td>' . $entry['count'];
+        echo '</td></tr>';
+    }
+
+    echo "</table>";
+}
+?>
 
 <?php
-$count = 20;
+$count = 10;
 $logEntries = $redirectDb->getAllLogEntries($count);
 
 if ($logEntries) {
@@ -71,10 +87,11 @@ if ($logEntries) {
         echo '</td><td>' . $entry['date'];
         echo '</td></tr>';
     }
+
+    echo "</table>";
 }
 
 ?>
-</table>
 </body>
 <script>
 function makeShort()
@@ -85,7 +102,8 @@ function makeShort()
     for( var i=0; i < 7; i++ )
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     
-    document.getElementById('shortname').value = text;
+    document.getElementById('short').value = text;
+
 }
 </script>
 </html>

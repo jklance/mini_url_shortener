@@ -1,38 +1,38 @@
 <?php
 
-$urlShort = $_POST['shortname'];
-$urlLong  = $_POST['url'];
-$username = $_POST['secusr'];
-$password = $_POST['seckey'];
+// TODO: once you leave POC state, let's do this intelligently
+// Assumes a variable called $config[security] as a 'username'=>'password' array
+
+$configsPath = "./";
+$configFile  = $configPath . "redirector.conf";
+require($configFile);
+
+require('UrlRedirector.php');
+require('UrlRedirectDb.php');
+
+$redirector = new UrlRedirector();
+$redirectDb = new UrlRedirectDb($config['db']);
 $errors   = null;
 
 
-// TODO: once you leave POC state, let's do this intelligently
-// Assumes a variable called $security as a 'username'=>'password' array
-require('../configs/jer.wtf.users.txt');
-
-require('../configs/db.conf');
-
-if (!isset($security[$username]) || $security[$username] != $password) {
-    $errors .= "Authorization Failure.\n";        
+if (!isset($config['security'][$_POST['secusr']]) || 
+    $config['security'][$_POST['secusr']] != $_POST['seckey']) {
+        $errors .= "Authorization Failure.\n";        
 }
 
-$shortenedChars = '/^[A-za-z0-9_]{1,20}$/';
-if (!preg_match($shortenedChars, $urlShort)) {
+$redirector->setUser($_POST['secusr']);
+
+if (!$redirector->setShort($_POST['short'])) {
     $errors .= "Invalid short name.\n";
 }
-
-if (filter_var($urlLong, FILTER_VALIDATE_URL) === false) {
+    
+if (!$redirector->setLong($_POST['url'])) {
     $errors .= "Invalid url.\n";
 }
 
 if (!$errors) {
-    $handle = mysqli_connect($jerwtf['host'], $jerwtf['login'], $jerwtf['pass'], $jerwtf['database'])
-        or die('Failure connecting to database');
-    $query = "INSERT INTO redirects VALUES('$urlShort', '$urlLong', NOW(), 0, '$username')";
-    mysqli_query($handle, $query) or die('Failure writing to database');
-    mysqli_close($handle);
-    echo 'Success! <a href="http://jer.wtf/' . $urlShort . '">jer.wtf/' . $urlShort . '</a>';
+    $redirectDb->setRedirectUrl($redirector);
+    echo 'Success! <a href="http://jer.wtf/' . $redirector->getShort() . '">jer.wtf/' . $redirector->getShort() . '</a>';
 } else {
     echo 'Fail. Errors:';
     echo $errors;

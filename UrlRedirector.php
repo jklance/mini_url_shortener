@@ -5,6 +5,7 @@ class UrlRedirector
 
     private $_abbreviation   = null;
     private $_longUrl        = null;
+    private $_user           = null;
 
     function __construct($abbrev = null, $url = null) {
         $short = $this->setShort($abbrev);
@@ -32,8 +33,20 @@ class UrlRedirector
         return null;
     }
 
+    function setUser($user) {
+        if ($user) {
+            $this->_user = $user;
+            return $this->_user;
+        }
+        return null;
+    }
+
     function getShort() {
         return $this->_abbreviation;
+    }
+
+    function getUser() {
+        return $this->_user;
     }
 
     function getLong() {
