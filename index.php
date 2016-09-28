@@ -1,6 +1,14 @@
 <?php
 $configsPath = "./";
 
+// Let's get them over on https if they're not
+if(empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off"){
+    $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    header('HTTP/1.1 301 Moved Permanently');
+    header('Location: ' . $redirect);
+    exit();
+}
+
 require('UrlRedirector.php');
 require('UrlRedirectDb.php');
 
@@ -42,19 +50,31 @@ if ($redirector->getLong()) {
             padding: 3px;
             text-align: left;
         }
-        
+        .resultBox {
+            text-align: center;
+            background: white;
+            border: 1px solid grey;
+            padding: 3px;
+            min-height: 20px;
+            margin: 8px auto;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 <h1>Jer...WTF?!</h1>
 <h2>Redirection Service</h2>
 
-<form id="urlshortenerform" method="post" action="https://jer.wtf/url_insert.php">
+<div id="submissionResult" class="resultBox">&nbsp;</div>
+
+<form id="urlshortenerform" >
 <input type="text" id="short" name="short" />Shortened URL (<a href="#" onclick="makeShort(); return false;">Generate</a>)<br />
 <input type="url" id="url" name="url" />URL <br />
 <input type="text" id="secusr" name="secusr" />Username <br />
 <input type="password" id="seckey" name="seckey" />Password <br />
-<input type="submit" /><br />
+<input type="submit" onclick="submitUrl(); return false;" /><br />
 </form>
 <?php
 $count = 10;
@@ -94,16 +114,36 @@ if ($logEntries) {
 ?>
 </body>
 <script>
-function makeShort()
-{
+function makeShort() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     for( var i=0; i < 7; i++ )
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     
-    document.getElementById('short').value = text;
+    $('#short').val(text);
 
+}
+
+function submitUrl() {
+    var formData = $("#urlshortenerform").serialize();
+    $.post(
+        "https://jer.wtf/addEntry.php",
+        formData,
+        function (data) {
+            $('#submissionResult').css("color", "black");
+            $('#submissionResult').text(data.responseText).css("color", "black");
+        },
+        'json'
+    ).fail(function(data) {
+        $('#submissionResult').text(data.responseText);
+        
+        var textColor = 'black';
+        if(data.status != 200) {
+            textColor = 'red';
+        }
+        $('#submissionResult').css("color", textColor);
+    });
 }
 </script>
 </html>
