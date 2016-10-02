@@ -1,0 +1,17 @@
+<?php
+$config = array(
+// Database Settings
+    db => array(
+        "login"     => "login",
+        "pass"      => "password",
+        "host"      => "localhost",
+        "database"  => "database",
+        "port"      => 3306,
+    ),
+// Logins
+    security => array(
+        'user1' => 'password',
+        'user2' => 'otherpassword',
+    )"
+);
+
