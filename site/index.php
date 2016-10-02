@@ -37,83 +37,141 @@ if ($redirector->getLong()) {
 
 <html>
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <title>Jer...WTF Redirection Service</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     <style>
         body {
-            background: lightgrey;
+            background: cornflowerblue;
+            max-width: 800px;
+            margin: 0 auto; 
+        }
+        #header {
+            text-align: center;
+        }
+        #mainOperation {
+            width: 90%;
+            min-width: 320px;
+            margin: 0 auto;
+        }
+        #urlShortenerForm {
+            width: 98%;
+            margin: 0 auto;
+            font-size: 16px;
+            text-align: center;
+        }
+        #statisticsArea {
+            margin-top: 20px;
+            font-size: 10pt;
+        }
+        .inputRow {
+            position: relative;
+            width: 95%;
+            margin: 5px auto;
+            padding: 2px;
+        }
+        .formElements {
+            width: 100%;
+            font-size: 16px;
+        }
+        #generate {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 16px;
         }
         table, th, td {
-            border: 1px solid black;
+            font-size: 8pt;
         }
         th, td {
             padding: 3px;
+            margin: 2px 5px;
             text-align: left;
         }
         .resultBox {
             text-align: center;
-            background: white;
+            background: lightgrey;
             border: 1px solid grey;
-            padding: 3px;
             min-height: 20px;
-            margin: 8px auto;
             font-weight: bold;
             font-family: monospace;
-            font-size: 16px;
         }
     </style>
 </head>
 <body>
-<h1>Jer...WTF?!</h1>
-<h2>Redirection Service</h2>
+<div id="header">
+    <h1>Jer...WTF?!</h1>
+    <h2>Redirection Service</h2>
+</div>
 
-<div id="submissionResult" class="resultBox">&nbsp;</div>
+<div id="mainOperation">
 
-<form id="urlshortenerform" >
-<input type="text" id="short" name="short" />Shortened URL (<a href="#" onclick="makeShort(); return false;">Generate</a>)<br />
-<input type="url" id="url" name="url" />URL <br />
-<input type="text" id="secusr" name="secusr" />Username <br />
-<input type="password" id="seckey" name="seckey" />Password <br />
-<input type="submit" onclick="submitUrl(); return false;" /><br />
-</form>
+    <form id="urlshortenerform" >
+    <div class="inputRow"><input id="submissionResult" class="resultBox formElements" disabled /></div>
+    <div class="inputRow">
+        <input type="text"      class="formElements" id="short"    name="short"  placeholder="Short Code" />
+        <input type="button"    id="generate" value="Auto" title="Click to generate a short code" onclick="makeShort(); return false;" />
+    </div>
+    <div class="inputRow"><input type="url"       class="formElements" id="url"      name="url"    placeholder="URL" /></div>
+    <div class="inputRow"><input type="text"      class="formElements" id="secusr"   name="secusr" placeholder="User Name" /></div>
+    <div class="inputRow"><input type="password"  class="formElements" id="seckey"   name="seckey" placeholder="Password" /></div>
+    <div class="inputRow"><input type="submit"    class="formElements" onclick="submitUrl(); return false;" /></div>
+    </form>
+</div>
+
+<div id="statisticsArea">
+    <div id="statsTabs">
+        <ul>
+            <li><a href="#statsTopShorts">Top Short URLs</a></li>
+            <li><a href="#statsRecentEntries">Recent Uses</a></li>
+        </ul>
+        <div id="statsTopShorts">
 <?php
-$count = 10;
-$logEntries = $redirectDb->getTopShorts($count);
+            $count = 10;
+            $logEntries = $redirectDb->getTopShorts($count);
 
-if ($logEntries) {
-    echo "<h3>Most Used Shorts</h3>\n<table>\n";
+            if ($logEntries) {
+                echo "<table>\n";
 
-    foreach ($logEntries as $entry) {
-        echo '<tr><td>' . $entry['short'];
-        echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
-        echo '</td><td>' . $entry['count'];
-        echo '</td></tr>';
-    }
+                foreach ($logEntries as $entry) {
+                    echo '<tr><td>' . $entry['short'];
+                    echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
+                    echo '</td><td>' . $entry['count'];
+                    echo '</td></tr>';
+                }
 
-    echo "</table>";
-}
+                echo "</table>";
+            }
 ?>
-
+        </div>
+        <div id="statsRecentEntries">
 <?php
-$count = 10;
-$logEntries = $redirectDb->getAllLogEntries($count);
+            $count = 10;
+            $logEntries = $redirectDb->getAllLogEntries($count);
 
-if ($logEntries) {
-    echo "<h3>Most Recent Uses</h3>\n<table>\n";
+            if ($logEntries) {
+                echo "<table>\n";
 
-    foreach ($logEntries as $entry) {
-        echo '<tr><td>' . $entry['short'];
-        echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
-        echo '</td><td>' . $entry['date'];
-        echo '</td></tr>';
-    }
+                foreach ($logEntries as $entry) {
+                    echo '<tr><td>' . $entry['short'];
+                    echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
+                    echo '</td><td>' . $entry['date'];
+                    echo '</td></tr>';
+                }
 
-    echo "</table>";
-}
-
+                echo "</table>";
+            }
 ?>
+        </div>
+    </div>
+</div>
 </body>
 <script>
+$( function() {
+    $( "#statsTabs" ).tabs();
+});
 function makeShort() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -126,17 +184,20 @@ function makeShort() {
 }
 
 function submitUrl() {
+    if (!$('#short').val()) {
+        makeShort();
+    }
     var formData = $("#urlshortenerform").serialize();
     $.post(
         "https://jer.wtf/addEntry.php",
         formData,
         function (data) {
             $('#submissionResult').css("color", "black");
-            $('#submissionResult').text(data.responseText).css("color", "black");
+            $('#submissionResult').val(data.responseText).css("color", "black");
         },
         'json'
     ).fail(function(data) {
-        $('#submissionResult').text(data.responseText);
+        $('#submissionResult').val(data.responseText);
         
         var textColor = 'black';
         if(data.status != 200) {
