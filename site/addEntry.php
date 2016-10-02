@@ -58,7 +58,7 @@ addLog($logfile, 'Processing ' . $_POST['short'] . ' as ' . $_POST['url']);
 
 $redirectDb->setRedirectUrl($redirector);
 
-$response = 'http://jer.wtf/' . $redirector->getShort();
+$response = 'https://jer.wtf/' . $redirector->getShort();
 http_response_code(200);
 
 echo $response;

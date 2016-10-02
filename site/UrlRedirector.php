@@ -18,6 +18,7 @@ class UrlRedirector
     }
 
     function setShort($abbrev) {
+        $abbrev = trim($abbrev);
         if ($this->_isValidAbbreviation($abbrev)) {
             $this->_abbreviation = $abbrev;
             return $this->_abbreviation;
@@ -26,6 +27,7 @@ class UrlRedirector
     }
 
     function setLong($url) {
+        $url = trim($url);
         if ($this->_isValidUrl($url)) {
             $this->_longUrl = $url;
             return $this->_longUrl;
