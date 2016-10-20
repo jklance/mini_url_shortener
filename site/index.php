@@ -169,7 +169,7 @@ if ($redirector->getLong()) {
         <div id="statsAllEntries">
 <?php
             $count = 10;
-            $logEntries = $redirectDb->getTopShorts();
+            $logEntries = $redirectDb->getAllShorts();
 
             if ($logEntries) {
                 echo "<table>\n";
@@ -177,7 +177,7 @@ if ($redirector->getLong()) {
                 foreach ($logEntries as $entry) {
                     echo '<tr><td>' . $entry['short'];
                     echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
-                    echo '</td><td>' . $entry['count'];
+                    echo '</td><td>' . $entry['created'];
                     echo '</td></tr>';
                 }
 

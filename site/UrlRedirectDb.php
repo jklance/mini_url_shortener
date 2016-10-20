@@ -64,6 +64,16 @@ class UrlRedirectDb
         return $logEntries;
     }
 
+    function getAllShorts($count = null) {
+        $this->_openHandle();
+
+        $logEntries = $this->_retrieveAllShorts($count);
+
+        $this->_closeHandle();
+
+        return $logEntries;
+    }
+
     function setRedirectUrl($redirector) {
         if ($redirector->getShort() && $redirector->getLong()) {
             $this->_openHandle();
@@ -96,6 +106,29 @@ class UrlRedirectDb
         $query .= " JOIN redirects main ON log.redirect_key = main.redirect_key";
         $query .= " GROUP BY short";
         $query .= " ORDER BY count DESC";
+
+        if ($count) {
+            $query .= " LIMIT $count";
+        }
+
+        $result = mysqli_query($this->_dbHandle, $query);
+        if ($result) {
+            $resArr = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+            if (is_array($resArr)) {
+                return $resArr;
+            }
+        }
+        return null;
+    }
+
+    private function _retrieveAllShorts($count) {
+        $query = "SELECT main.redirect_key AS short";
+        $query .= ", main.user AS user";
+        $query .= ", main.redirect_url AS url";
+        $query .= ", main.created_at AS created";
+        $query .= " FROM redirects main";
+        $query .= " ORDER BY created DESC";
 
         if ($count) {
             $query .= " LIMIT $count";
