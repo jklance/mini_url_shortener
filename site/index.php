@@ -126,6 +126,7 @@ if ($redirector->getLong()) {
         <ul>
             <li><a href="#statsTopShorts">Top Short URLs</a></li>
             <li><a href="#statsRecentEntries">Recent Uses</a></li>
+            <li><a href="#statsAllEntries">All Entries</a></li>
         </ul>
         <div id="statsTopShorts">
 <?php
@@ -158,6 +159,25 @@ if ($redirector->getLong()) {
                     echo '<tr><td>' . $entry['short'];
                     echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
                     echo '</td><td>' . $entry['date'];
+                    echo '</td></tr>';
+                }
+
+                echo "</table>";
+            }
+?>
+        </div>
+        <div id="statsAllEntries">
+<?php
+            $count = 10;
+            $logEntries = $redirectDb->getTopShorts();
+
+            if ($logEntries) {
+                echo "<table>\n";
+
+                foreach ($logEntries as $entry) {
+                    echo '<tr><td>' . $entry['short'];
+                    echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
+                    echo '</td><td>' . $entry['count'];
                     echo '</td></tr>';
                 }
 
