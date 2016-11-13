@@ -109,7 +109,7 @@ if ($redirector->getLong()) {
 <div id="mainOperation">
 
     <form id="urlshortenerform" >
-    <div class="inputRow"><input id="submissionResult" class="resultBox formElements" disabled /></div>
+    <div class="inputRow"><input id="submissionResult" class="resultBox formElements" readonly /></div>
     <div class="inputRow">
         <input type="text"      class="formElements" id="short"    name="short"  placeholder="Short Code" />
         <input type="button"    id="generate" value="Auto" title="Click to generate a short code" onclick="makeShort(); return false;" />
@@ -130,13 +130,16 @@ if ($redirector->getLong()) {
         </ul>
         <div id="statsTopShorts">
 <?php
-            $count = 10;
+            $count = 20;
             $logEntries = $redirectDb->getTopShorts($count);
 
             if ($logEntries) {
                 echo "<table>\n";
 
                 foreach ($logEntries as $entry) {
+                    if (strlen($entry['url']) > 75) {
+                        $entry['url'] = substr($entry['url'],0,75) . '...';
+                    }
                     echo '<tr><td>' . $entry['short'];
                     echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
                     echo '</td><td>' . $entry['count'];
@@ -149,13 +152,16 @@ if ($redirector->getLong()) {
         </div>
         <div id="statsRecentEntries">
 <?php
-            $count = 10;
+            $count = 20;
             $logEntries = $redirectDb->getAllLogEntries($count);
 
             if ($logEntries) {
                 echo "<table>\n";
 
                 foreach ($logEntries as $entry) {
+                    if (strlen($entry['url']) > 75) {
+                        $entry['url'] = substr($entry['url'],0,75) . '...';
+                    }
                     echo '<tr><td>' . $entry['short'];
                     echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
                     echo '</td><td>' . $entry['date'];
@@ -175,6 +181,9 @@ if ($redirector->getLong()) {
                 echo "<table>\n";
 
                 foreach ($logEntries as $entry) {
+                    if (strlen($entry['url']) > 75) {
+                        $entry['url'] = substr($entry['url'],0,75) . '...';
+                    }
                     echo '<tr><td>' . $entry['short'];
                     echo '</td><td><a href="' . $entry['short'] . '">' . $entry['url'] . '</a>';
                     echo '</td><td>' . $entry['created'];
