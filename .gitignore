@@ -1,3 +1,5 @@
 favicon.*
 *.swp
 *.conf
+*.sublime-*
+*.DS_Store
