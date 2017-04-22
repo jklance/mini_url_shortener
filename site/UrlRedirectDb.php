@@ -85,8 +85,34 @@ class UrlRedirectDb
         return false;
     }
 
+    function updateRedirectUrl($redirector) {
+        if ($redirector->getShort() && $redirector->$getLong() 
+            && $redirector->getUser()) {
+
+            $this->_openHandle();
+
+            return $this->_updateRedirectUrl($redirector);
+
+            $this->_closeHandle();
+        }
+        return false;
+    }
+
 /***** Private Methods ******************************************************/
-   
+
+    private function _updateRedirectUrl($redirector) {
+        $query  = "UPDATE redirects ";
+        $query .= "SET redirect_url = '" . $redirector->getLong() . "' ";
+        $query .= "WHERE short = '" . $redirector->getShort() . "' AND ";
+        $query .= "user = '" . $redirector->getUser() . "'";
+
+        if (mysqli_query($this->_dbHandle, $query) === true) {
+            return true;
+        }
+
+        return false;
+    }
+
     private function _postRedirectToDb($redirector) {
         $query  = "INSERT INTO redirects VALUES";
         $query .= "('" . $redirector->getShort() . "','" . $redirector->getLong() . "',NOW(),0,'" . $redirector->getUser() ."')";
