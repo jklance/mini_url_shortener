@@ -13,7 +13,7 @@ require('UrlRedirector.php');
 require('UrlRedirectDb.php');
 
 
-$urlElements    = trim($_SERVER["REQUEST_URI"], "\s\/");
+$urlElements    = trim($_SERVER["REQUEST_URI"], "\\/");
 $urlParts       = explode('/', $urlElements);
 $redirectUrl    = null;
 
