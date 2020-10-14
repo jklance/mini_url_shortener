@@ -19,6 +19,11 @@ class UrlRedirector
 
     function setShort($abbrev) {
         $abbrev = trim($abbrev);
+        // This set of shenanigans is because of FB adding a querystring to the end of things
+        // It's an ugly solution...TODO: do this right
+        $abbrev = explode("?", $abbrev);
+        $abbrev = is_array($abbrev) ? $abbrev[0] : $abbrev;
+        
         if ($this->_isValidAbbreviation($abbrev)) {
             $this->_abbreviation = $abbrev;
             return $this->_abbreviation;
