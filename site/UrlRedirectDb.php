@@ -6,7 +6,7 @@ class UrlRedirectDb
     private $_username = null;
     private $_password = null;
     private $_database = null;
-    private $_portnum = 3306;
+    private int $_portnum = 3306;
 
     private $_dbHandle;
 
@@ -202,8 +202,8 @@ class UrlRedirectDb
         $result = mysqli_query($this->_dbHandle, $query);
         $row    = mysqli_fetch_assoc($result);
 
-        if (isset($row[redirect_url])) {
-            return $row[redirect_url];
+        if (isset($row[\REDIRECT_URL])) {
+            return $row[\REDIRECT_URL];
         }
         return null;
     }

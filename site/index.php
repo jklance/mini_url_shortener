@@ -137,7 +137,7 @@ if ($redirector->getLong()) {
                 echo "<table>\n";
 
                 foreach ($logEntries as $entry) {
-                    if (strlen($entry['url']) > 75) {
+                    if (strlen((string) $entry['url']) > 75) {
                         $entry['url'] = substr($entry['url'],0,75) . '...';
                     }
                     echo '<tr><td>' . $entry['short'];
@@ -159,7 +159,7 @@ if ($redirector->getLong()) {
                 echo "<table>\n";
 
                 foreach ($logEntries as $entry) {
-                    if (strlen($entry['url']) > 75) {
+                    if (strlen((string) $entry['url']) > 75) {
                         $entry['url'] = substr($entry['url'],0,75) . '...';
                     }
                     echo '<tr><td>' . $entry['short'];
@@ -181,7 +181,7 @@ if ($redirector->getLong()) {
                 echo "<table>\n";
 
                 foreach ($logEntries as $entry) {
-                    if (strlen($entry['url']) > 75) {
+                    if (strlen((string) $entry['url']) > 75) {
                         $entry['url'] = substr($entry['url'],0,75) . '...';
                     }
                     echo '<tr><td>' . $entry['short'];
@@ -237,3 +237,4 @@ function submitUrl() {
 }
 </script>
 </html>
+

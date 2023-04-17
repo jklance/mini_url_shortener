@@ -72,7 +72,7 @@ class UrlRedirector
     private function _isValidAbbreviation($abbrev) {
         $shortRegex = '/^[A-za-z0-9_]{1,20}$/';
 
-        if (preg_match($shortRegex, $abbrev)) {
+        if (preg_match($shortRegex, (string) $abbrev)) {
             return true;
         }
         return false;
