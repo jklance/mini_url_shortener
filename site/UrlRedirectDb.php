@@ -202,8 +202,8 @@ class UrlRedirectDb
         $result = mysqli_query($this->_dbHandle, $query);
         $row    = mysqli_fetch_assoc($result);
 
-        if (isset($row[\REDIRECT_URL])) {
-            return $row[\REDIRECT_URL];
+        if (isset($row[redirect_url])) {
+            return $row[redirect_url];
         }
         return null;
     }
