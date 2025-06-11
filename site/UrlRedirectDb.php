@@ -12,10 +12,11 @@ class UrlRedirectDb
 
     function __construct($dbInfoArr) {
         if (!is_array($dbInfoArr)) {
-            return false;
+            throw new InvalidArgumentException("Database configuration must be an array.");
         }
         if (sizeof($dbInfoArr) < 4 || sizeof($dbInfoArr) > 5) {
-            return false;
+            throw new InvalidArgumentException("Required database configuration keys (host, login, pass, database) are missing.");
+
         }
 
         $this->_hostname = $dbInfoArr['host'];
@@ -117,7 +118,7 @@ class UrlRedirectDb
         $query  = "INSERT INTO redirects VALUES";
         $query .= "('" . $redirector->getShort() . "','" . $redirector->getLong() . "',NOW(),0,'" . $redirector->getUser() ."')";
 
-        if (mysqli_query($this->_dbHandle, $query) === true) {
+        if (mysqli_query(mysql: $this->_dbHandle, query: $query) === true) {
             return true;
         }
         return false;
@@ -137,9 +138,9 @@ class UrlRedirectDb
             $query .= " LIMIT $count";
         }
 
-        $result = mysqli_query($this->_dbHandle, $query);
+        $result = mysqli_query(mysql: $this->_dbHandle, query: $query);
         if ($result) {
-            $resArr = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            $resArr = mysqli_fetch_all(result: $result, mode: MYSQLI_ASSOC);
 
             if (is_array($resArr)) {
                 return $resArr;
@@ -160,9 +161,9 @@ class UrlRedirectDb
             $query .= " LIMIT $count";
         }
 
-        $result = mysqli_query($this->_dbHandle, $query);
+        $result = mysqli_query(mysql: $this->_dbHandle, query: $query);
         if ($result) {
-            $resArr = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            $resArr = mysqli_fetch_all(result: $result, mode: MYSQLI_ASSOC);
 
             if (is_array($resArr)) {
                 return $resArr;
@@ -184,11 +185,11 @@ class UrlRedirectDb
             $query .= " LIMIT $count";
         }
 
-        $result = mysqli_query($this->_dbHandle, $query);
+        $result = mysqli_query(mysql: $this->_dbHandle, query: $query);
         if ($result) {
-            $resArr = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            $resArr = mysqli_fetch_all(result: $result, mode: MYSQLI_ASSOC);
 
-            if (is_array($resArr)) {
+            if (is_array(value: $resArr)) {
                 return $resArr;
             }
         }
@@ -199,8 +200,8 @@ class UrlRedirectDb
     private function _retrieveRedirectUrlFromDb($abbreviation) {
         $query = "SELECT redirect_url FROM redirects WHERE redirect_key = '$abbreviation'";
 
-        $result = mysqli_query($this->_dbHandle, $query);
-        $row    = mysqli_fetch_assoc($result);
+        $result = mysqli_query(mysql: $this->_dbHandle, query: $query);
+        $row    = mysqli_fetch_assoc(result: $result);
 
         if (isset($row[redirect_url])) {
             return $row[redirect_url];
@@ -211,7 +212,7 @@ class UrlRedirectDb
     private function _updateDbLogForRedirect($abbreviation) {
         $query  = "INSERT INTO redirect_log VALUES('$abbreviation', NOW())";
         
-        if (mysqli_query($this->_dbHandle, $query) === true) {
+        if (mysqli_query(mysql: $this->_dbHandle, query: $query) === true) {
             return true;
         }
 
@@ -228,11 +229,11 @@ class UrlRedirectDb
     private function _openHandle() {
         if ($this->_fieldsFilled()) {
             $this->_dbHandle = mysqli_connect(
-                $this->_hostname,
-                $this->_username,
-                $this->_password,
-                $this->_database,
-                $this->_portnum
+                hostname: $this->_hostname,
+                username: $this->_username,
+                password: $this->_password,
+                database: $this->_database,
+                port: $this->_portnum
             ) or die('Graceless DB failure connecting!');
             return true;
         }
@@ -240,6 +241,6 @@ class UrlRedirectDb
     }
 
     private function _closeHandle() {
-        mysqli_close($this->_dbHandle);
+        mysqli_close(mysql: $this->_dbHandle);
     }
 }
