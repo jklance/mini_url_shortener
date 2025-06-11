@@ -86,7 +86,7 @@ class UrlRedirectDb
     }
 
     function updateRedirectUrl($redirector) {
-        if ($redirector->getShort() && $redirector->$getLong() 
+        if ($redirector->getShort() && $redirector->getLong() 
             && $redirector->getUser()) {
 
             $this->_openHandle();
