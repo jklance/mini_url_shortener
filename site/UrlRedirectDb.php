@@ -200,8 +200,8 @@ class UrlRedirectDb
     private function _retrieveRedirectUrlFromDb($abbreviation) {
         $query = "SELECT redirect_url FROM redirects WHERE redirect_key = '$abbreviation'";
 
-        $result = mysqli_query($this->_dbHandle, $query);
-        $row    = mysqli_fetch_assoc($result);
+        /*$result = mysqli_query($this->_dbHandle, $query);
+        $row    = mysqli_fetch_assoc($result);*/
 
         if ($stmt = mysqli_prepare($this->_dbHandle, $query)) {
             $stmt->execute();
