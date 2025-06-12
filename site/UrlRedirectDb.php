@@ -28,7 +28,7 @@ class UrlRedirectDb
             $this->_portnum = $dbInfoArr['port'];
         }
 
-        return true;
+        return ;
     }
 
     function getRedirectUrl($redirector) {
@@ -81,7 +81,7 @@ class UrlRedirectDb
 
             return $this->_postRedirectToDb($redirector);
 
-            $this->_closeHandle();
+            
         }
         return false;
     }
@@ -94,7 +94,6 @@ class UrlRedirectDb
 
             return $this->_updateRedirectUrl($redirector);
 
-            $this->_closeHandle();
         }
         return false;
     }
@@ -206,6 +205,7 @@ class UrlRedirectDb
         if ($stmt = mysqli_prepare($this->_dbHandle, $query)) {
             $stmt->execute();
             $stmt->bind_result($redirectUrl);
+            $stmt->fetch();
             return $redirectUrl;
         }
             
