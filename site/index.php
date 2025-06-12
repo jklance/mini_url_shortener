@@ -1,5 +1,5 @@
 <?php
-$configsPath = "./";
+$configsPath = "../";
 
 // Let's get them over on https if they're not
 if(empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off"){
@@ -17,7 +17,7 @@ $urlElements    = trim($_SERVER["REQUEST_URI"], "\\/");
 $urlParts       = explode('/', $urlElements);
 $redirectUrl    = null;
 
-$configFile     = $configPath . "redirector.conf";
+$configFile     = $configsPath . "redirector.conf";
 require($configFile);
 
 $redirector = new UrlRedirector($urlParts[0]);

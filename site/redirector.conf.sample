@@ -1,7 +1,7 @@
 <?php
 $config = array(
 // Database Settings
-    db => array(
+    $db => array(
         "login"     => "login",
         "pass"      => "password",
         "host"      => "localhost",
@@ -9,7 +9,7 @@ $config = array(
         "port"      => 3306,
     ),
 // Logins
-    security => array(
+    $security => array(
         'user1' => 'password',
         'user2' => 'otherpassword',
     )"

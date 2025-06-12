@@ -3,3 +3,4 @@ favicon.*
 *.conf
 *.sublime-*
 *.DS_Store
+.vscode

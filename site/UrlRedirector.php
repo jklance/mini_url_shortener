@@ -10,11 +10,12 @@ class UrlRedirector
     function __construct($abbrev = null, $url = null) {
         $short = $this->setShort($abbrev);
         $long = $this->setLong($url); 
-        
+
         if ($short && $long) {
-            return true;
+            return ;
         }
-        return false;
+        
+        //throw new InvalidArgumentException("Invalid arguments sent to constructor.");
     }
 
     function setShort($abbrev) {

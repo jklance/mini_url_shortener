@@ -12,10 +12,11 @@ class UrlRedirectDb
 
     function __construct($dbInfoArr) {
         if (!is_array($dbInfoArr)) {
-            return false;
+            throw new InvalidArgumentException("Database configuration must be an array.");
         }
         if (sizeof($dbInfoArr) < 4 || sizeof($dbInfoArr) > 5) {
-            return false;
+            throw new InvalidArgumentException("Required database configuration keys (host, login, pass, database) are missing.");
+
         }
 
         $this->_hostname = $dbInfoArr['host'];
@@ -27,7 +28,7 @@ class UrlRedirectDb
             $this->_portnum = $dbInfoArr['port'];
         }
 
-        return true;
+        return ;
     }
 
     function getRedirectUrl($redirector) {
@@ -80,20 +81,19 @@ class UrlRedirectDb
 
             return $this->_postRedirectToDb($redirector);
 
-            $this->_closeHandle();
+            
         }
         return false;
     }
 
     function updateRedirectUrl($redirector) {
-        if ($redirector->getShort() && $redirector->$getLong() 
+        if ($redirector->getShort() && $redirector->getLong() 
             && $redirector->getUser()) {
 
             $this->_openHandle();
 
             return $this->_updateRedirectUrl($redirector);
 
-            $this->_closeHandle();
         }
         return false;
     }
@@ -199,12 +199,20 @@ class UrlRedirectDb
     private function _retrieveRedirectUrlFromDb($abbreviation) {
         $query = "SELECT redirect_url FROM redirects WHERE redirect_key = '$abbreviation'";
 
-        $result = mysqli_query($this->_dbHandle, $query);
-        $row    = mysqli_fetch_assoc($result);
+        /*$result = mysqli_query($this->_dbHandle, $query);
+        $row    = mysqli_fetch_assoc($result);*/
 
+        if ($stmt = mysqli_prepare($this->_dbHandle, $query)) {
+            $stmt->execute();
+            $stmt->bind_result($redirectUrl);
+            $stmt->fetch();
+            return $redirectUrl;
+        }
+            
+        /*
         if (isset($row[redirect_url])) {
             return $row[redirect_url];
-        }
+        }*/
         return null;
     }
 
