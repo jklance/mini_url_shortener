@@ -14,7 +14,8 @@ class UrlRedirector
         if ($short && $long) {
             return true;
         }
-        return false;
+        
+        throw new InvalidArgumentException("Invalid arguments sent to constructor.");
     }
 
     function setShort($abbrev) {
