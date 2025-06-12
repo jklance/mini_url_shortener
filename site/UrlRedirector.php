@@ -10,7 +10,7 @@ class UrlRedirector
     function __construct($abbrev = null, $url = null) {
         $short = $this->setShort($abbrev);
         $long = $this->setLong($url); 
-        
+
         if ($short && $long) {
             return true;
         }
