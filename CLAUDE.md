@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A personal URL shortener (jer.wtf) built with PHP 8.3 and MySQL. No build system, package manager, or test framework — it's a small, self-contained Apache/PHP application.
+A personal URL shortener (jer.wtf) built with PHP 8.3 and MySQL. A small, self-contained Apache/PHP application.
 
 ## Setup
 
@@ -32,6 +32,18 @@ All application code lives in `site/`.
 **DB tables** (inferred from queries):
 - `redirects` — columns: `redirect_key`, `redirect_url`, `created_at`, unknown counter column, `user`
 - `redirect_log` — columns: `redirect_key`, `date_used`
+
+## Tests
+
+```bash
+# Run all tests
+vendor/bin/phpunit
+
+# Run a single test
+vendor/bin/phpunit --filter testMethodName
+```
+
+Tests live in `tests/`. Autoloading uses a classmap over `site/` (via Composer).
 
 ## Key Details
 
