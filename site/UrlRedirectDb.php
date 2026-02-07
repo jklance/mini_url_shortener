@@ -9,11 +9,15 @@ class UrlRedirectDb
     private int $_portnum = 3306;
 
     private $_dbHandle;
+    private bool $_externalConnection = false;
 
-    function __construct($dbInfoArr) {
-        if (!is_array($dbInfoArr)) {
-            throw new InvalidArgumentException("Database configuration must be an array.");
+    function __construct(array|\mysqli $dbInfoArr) {
+        if ($dbInfoArr instanceof \mysqli) {
+            $this->_dbHandle = $dbInfoArr;
+            $this->_externalConnection = true;
+            return;
         }
+
         if (sizeof($dbInfoArr) < 4 || sizeof($dbInfoArr) > 5) {
             throw new InvalidArgumentException("Required database configuration keys (host, login, pass, database) are missing.");
 
@@ -79,21 +83,24 @@ class UrlRedirectDb
         if ($redirector->getShort() && $redirector->getLong()) {
             $this->_openHandle();
 
-            return $this->_postRedirectToDb($redirector);
+            $result = $this->_postRedirectToDb($redirector);
+            $this->_closeHandle();
 
-            
+            return $result;
         }
         return false;
     }
 
     function updateRedirectUrl($redirector) {
-        if ($redirector->getShort() && $redirector->getLong() 
+        if ($redirector->getShort() && $redirector->getLong()
             && $redirector->getUser()) {
 
             $this->_openHandle();
 
-            return $this->_updateRedirectUrl($redirector);
+            $result = $this->_updateRedirectUrl($redirector);
+            $this->_closeHandle();
 
+            return $result;
         }
         return false;
     }
@@ -106,7 +113,7 @@ class UrlRedirectDb
         $query .= "WHERE short = '" . $redirector->getShort() . "' AND ";
         $query .= "user = '" . $redirector->getUser() . "'";
 
-        if (mysqli_query($this->_dbHandle, $query) === true) {
+        if ($this->_dbHandle->query($query) === true) {
             return true;
         }
 
@@ -117,7 +124,7 @@ class UrlRedirectDb
         $query  = "INSERT INTO redirects VALUES";
         $query .= "('" . $redirector->getShort() . "','" . $redirector->getLong() . "',NOW(),0,'" . $redirector->getUser() ."')";
 
-        if (mysqli_query($this->_dbHandle, $query) === true) {
+        if ($this->_dbHandle->query($query) === true) {
             return true;
         }
         return false;
@@ -137,9 +144,9 @@ class UrlRedirectDb
             $query .= " LIMIT $count";
         }
 
-        $result = mysqli_query($this->_dbHandle, $query);
+        $result = $this->_dbHandle->query($query);
         if ($result) {
-            $resArr = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            $resArr = $result->fetch_all(MYSQLI_ASSOC);
 
             if (is_array($resArr)) {
                 return $resArr;
@@ -160,9 +167,9 @@ class UrlRedirectDb
             $query .= " LIMIT $count";
         }
 
-        $result = mysqli_query($this->_dbHandle, $query);
+        $result = $this->_dbHandle->query($query);
         if ($result) {
-            $resArr = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            $resArr = $result->fetch_all(MYSQLI_ASSOC);
 
             if (is_array($resArr)) {
                 return $resArr;
@@ -184,9 +191,9 @@ class UrlRedirectDb
             $query .= " LIMIT $count";
         }
 
-        $result = mysqli_query($this->_dbHandle, $query);
+        $result = $this->_dbHandle->query($query);
         if ($result) {
-            $resArr = mysqli_fetch_all($result, MYSQLI_ASSOC);
+            $resArr = $result->fetch_all(MYSQLI_ASSOC);
 
             if (is_array($resArr)) {
                 return $resArr;
@@ -199,27 +206,21 @@ class UrlRedirectDb
     private function _retrieveRedirectUrlFromDb($abbreviation) {
         $query = "SELECT redirect_url FROM redirects WHERE redirect_key = '$abbreviation'";
 
-        /*$result = mysqli_query($this->_dbHandle, $query);
-        $row    = mysqli_fetch_assoc($result);*/
-
-        if ($stmt = mysqli_prepare($this->_dbHandle, $query)) {
+        if ($stmt = $this->_dbHandle->prepare($query)) {
             $stmt->execute();
-            $stmt->bind_result($redirectUrl);
-            $stmt->fetch();
-            return $redirectUrl;
+            $result = $stmt->get_result();
+            if ($result && $row = $result->fetch_assoc()) {
+                return $row['redirect_url'];
+            }
         }
-            
-        /*
-        if (isset($row[redirect_url])) {
-            return $row[redirect_url];
-        }*/
+
         return null;
     }
 
     private function _updateDbLogForRedirect($abbreviation) {
         $query  = "INSERT INTO redirect_log VALUES('$abbreviation', NOW())";
-        
-        if (mysqli_query($this->_dbHandle, $query) === true) {
+
+        if ($this->_dbHandle->query($query) === true) {
             return true;
         }
 
@@ -234,6 +235,10 @@ class UrlRedirectDb
     }
 
     private function _openHandle() {
+        if ($this->_externalConnection) {
+            return true;
+        }
+
         if ($this->_fieldsFilled()) {
             $this->_dbHandle = mysqli_connect(
                 $this->_hostname,
@@ -248,6 +253,10 @@ class UrlRedirectDb
     }
 
     private function _closeHandle() {
-        mysqli_close($this->_dbHandle);
+        if ($this->_externalConnection) {
+            return;
+        }
+
+        $this->_dbHandle->close();
     }
 }
