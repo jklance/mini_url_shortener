@@ -17,8 +17,7 @@ $urlElements    = trim($_SERVER["REQUEST_URI"], "\\/");
 $urlParts       = explode('/', $urlElements);
 $redirectUrl    = null;
 
-$configFile     = $configsPath . "redirector.conf";
-require($configFile);
+require('../redirector.conf');
 
 $redirector = new UrlRedirector($urlParts[0]);
 $redirectDb = new UrlRedirectDb($config['db']);

@@ -11,10 +11,7 @@ addLog($logfile, 'Starting...');
 // TODO: once you leave POC state, let's do this intelligently
 // Assumes a variable called $config[security] as a 'username'=>'password' array
 
-$configsPath = "./";
-$configFile  = $configPath . "redirector.conf";
-require($configFile);
-
+require('../redirector.conf');
 require('UrlRedirector.php');
 require('UrlRedirectDb.php');
 
